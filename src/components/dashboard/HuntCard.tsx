@@ -107,7 +107,7 @@ export function HuntCard({ hunt, matchCount = 0, onToggle, onDelete }: HuntCardP
           >
             {scouting ? (
               <>
-                <Loader className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
                 Scouting...
               </>
             ) : (

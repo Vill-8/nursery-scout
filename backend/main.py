@@ -10,10 +10,10 @@ load_dotenv()
 
 app = FastAPI(title="Nursery Scout API")
 
-# CORS setup for React frontend
+# CORS setup FIRST - before all routes
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080", "https://nursery-scout.vercel.app"],
+    allow_origins=["*"],  # Allow all origins for now
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
