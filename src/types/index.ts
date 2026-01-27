@@ -6,6 +6,7 @@ export interface Hunt {
   id: string;
   user_id: string;
   brand: Brand;
+  item_name: string | null;
   category: ItemCategory;
   max_price: number;
   zip_code: string;

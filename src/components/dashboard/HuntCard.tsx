@@ -1,8 +1,11 @@
 import { Hunt } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, DollarSign, Pause, Play, Trash2 } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { MapPin, DollarSign, Pause, Play, Trash2, Search, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface HuntCardProps {
   hunt: Hunt;
@@ -26,6 +29,37 @@ const categoryIcons: Record<string, string> = {
 };
 
 export function HuntCard({ hunt, matchCount = 0, onToggle, onDelete }: HuntCardProps) {
+  const [scouting, setScouting] = useState(false);
+
+  const handleScrape = async () => {
+    setScouting(true);
+    try {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+      const response = await fetch(`${backendUrl}/api/scout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brand: hunt.brand,
+          item_name: hunt.item_name,
+          hunt_id: hunt.id,
+          max_price: hunt.max_price
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to scrape deals");
+      }
+
+      const data = await response.json();
+      toast.success(`🎉 Found ${data.deals_found} deals! Check your hunt card.`);
+    } catch (error) {
+      toast.error("Failed to scout deals. Make sure backend is running on localhost:8000");
+      console.error(error);
+    } finally {
+      setScouting(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -40,6 +74,9 @@ export function HuntCard({ hunt, matchCount = 0, onToggle, onDelete }: HuntCardP
             </Badge>
             <span className="text-lg">{categoryIcons[hunt.category]}</span>
             <span className="font-medium">{hunt.category}</span>
+            {hunt.item_name && (
+              <span className="text-sm text-muted-foreground">• {hunt.item_name}</span>
+            )}
           </div>
           
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -60,6 +97,25 @@ export function HuntCard({ hunt, matchCount = 0, onToggle, onDelete }: HuntCardP
               {matchCount} match{matchCount > 1 ? "es" : ""}
             </Badge>
           )}
+          
+          <Button
+            variant="default"
+            size="sm"
+            className="gap-2"
+            onClick={handleScrape}
+            disabled={scouting}
+          >
+            {scouting ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin" />
+                Scouting...
+              </>
+            ) : (
+              <>
+                🔍 Scout Now
+              </>
+            )}
+          </Button>
           
           <Button
             variant="ghost"

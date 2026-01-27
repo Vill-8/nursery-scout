@@ -25,6 +25,7 @@ export function CreateHuntDialog({ onCreated }: CreateHuntDialogProps) {
   
   const [brand, setBrand] = useState<Brand | "">("");
   const [category, setCategory] = useState<ItemCategory | "">("");
+  const [itemName, setItemName] = useState("");
   const [maxPrice, setMaxPrice] = useState([500]);
   const [zipCode, setZipCode] = useState("");
   const [radius, setRadius] = useState([25]);
@@ -47,6 +48,7 @@ export function CreateHuntDialog({ onCreated }: CreateHuntDialogProps) {
     const { error } = await supabase.from("hunts").insert({
       user_id: user.id,
       brand,
+      item_name: itemName || null,
       category,
       max_price: maxPrice[0],
       zip_code: zipCode,
@@ -56,8 +58,8 @@ export function CreateHuntDialog({ onCreated }: CreateHuntDialogProps) {
     setLoading(false);
 
     if (error) {
-      toast.error("Failed to create hunt");
-      console.error(error);
+      toast.error(`Failed to create hunt: ${error.message}`);
+      console.error("Supabase error:", error);
       return;
     }
 
@@ -70,6 +72,7 @@ export function CreateHuntDialog({ onCreated }: CreateHuntDialogProps) {
   const resetForm = () => {
     setBrand("");
     setCategory("");
+    setItemName("");
     setMaxPrice([500]);
     setZipCode("");
     setRadius([25]);
@@ -104,6 +107,17 @@ export function CreateHuntDialog({ onCreated }: CreateHuntDialogProps) {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Product Name */}
+          <div className="space-y-2">
+            <Label htmlFor="itemName">Product Name <span className="text-muted-foreground text-sm">(optional)</span></Label>
+            <Input
+              id="itemName"
+              placeholder="SNOO Smart Sleeper"
+              value={itemName}
+              onChange={(e) => setItemName(e.target.value)}
+            />
           </div>
 
           {/* Category Selection */}
