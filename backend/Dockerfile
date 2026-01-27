@@ -7,18 +7,18 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 libnspr4 libnss3 libdbus-1-3 libatk1.0-0 libxkbcommon0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy only requirements
-COPY requirements.txt .
+# Copy requirements first
+COPY backend/requirements.txt .
 
-# Install Python deps
+# Install Python packages
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Playwright
 RUN python -m playwright install chromium
 
-# Copy only backend code (COPY . . will only copy contents of backend folder since this is backend/Dockerfile)
-COPY *.py ./
-COPY Procfile .
+# Copy backend code
+COPY backend/main.py .
+COPY backend/scraper.py .
 
 EXPOSE 8000
 
