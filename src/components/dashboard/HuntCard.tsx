@@ -34,7 +34,7 @@ export function HuntCard({ hunt, matchCount = 0, onToggle, onDelete }: HuntCardP
   const handleScrape = async () => {
     setScouting(true);
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
       const response = await fetch(`${backendUrl}/api/scout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
