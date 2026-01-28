@@ -1,6 +1,4 @@
 import asyncio
-from playwright.async_api import async_playwright
-import re
 from datetime import datetime
 from supabase import create_client
 import os
@@ -15,103 +13,45 @@ supabase = create_client(supabase_url, supabase_key)
 
 
 async def scrape_google_shopping(query: str, max_price: int | None = None):
-    """Scrape Google Shopping for deals"""
-    deals = []
-    try:
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            page = await browser.new_page()
-            
-            # Google Shopping search
-            url = f"https://www.google.com/search?tbm=shop&q={query.replace(' ', '+')}"
-            await page.goto(url, wait_until="domcontentloaded")
-            await page.wait_for_timeout(2000)
-            
-            # Extract product listings
-            products = await page.query_selector_all("div[data-item-id]")
-            
-            for product in products[:5]:  # Limit to 5 results
-                try:
-                    title_elem = await product.query_selector("h3")
-                    price_elem = await product.query_selector("span.a6T")
-                    link_elem = await product.query_selector("a")
-                    
-                    if title_elem and price_elem and link_elem:
-                        title = await title_elem.text_content()
-                        price_text = await price_elem.text_content()
-                        link = await link_elem.get_attribute("href")
-                        
-                        # Extract numeric price
-                        price_match = re.search(r"\$?([\d,]+(?:\.\d{2})?)", price_text)
-                        if price_match:
-                            price = float(price_match.group(1).replace(",", ""))
-                            
-                            if max_price is None or price <= max_price:
-                                deals.append({
-                                    "title": title.strip(),
-                                    "price": price,
-                                    "url": link,
-                                    "store": "Google Shopping",
-                                    "platform": "google_shopping"
-                                })
-                except:
-                    pass
-            
-            await browser.close()
-    except Exception as e:
-        print(f"❌ Google Shopping scrape error: {e}")
-    
-    return deals
+    """Mock Google Shopping scraper"""
+    # Return mock deals for now to test the flow
+    return [
+        {
+            "title": f"Google Shopping: {query} - Premium Deal",
+            "price": 149.99,
+            "url": f"https://www.google.com/search?q={query.replace(' ', '+')}",
+            "store": "Google Shopping",
+            "platform": "google_shopping"
+        },
+        {
+            "title": f"Google Shopping: {query} - Budget Option",
+            "price": 99.99,
+            "url": f"https://www.google.com/search?q={query.replace(' ', '+')}",
+            "store": "Google Shopping",
+            "platform": "google_shopping"
+        }
+    ]
 
 
 async def scrape_ebay(query: str, max_price: int | None = None):
-    """Scrape eBay for deals"""
-    deals = []
-    try:
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            page = await browser.new_page()
-            
-            # eBay search
-            url = f"https://www.ebay.com/sch/i.html?_nkw={query.replace(' ', '+')}"
-            await page.goto(url, wait_until="domcontentloaded")
-            await page.wait_for_timeout(2000)
-            
-            # Extract listings
-            items = await page.query_selector_all("div.s-item")
-            
-            for item in items[:5]:  # Limit to 5 results
-                try:
-                    title_elem = await item.query_selector("h3 span")
-                    price_elem = await item.query_selector("span.s-price")
-                    link_elem = await item.query_selector("a.s-item__link")
-                    
-                    if title_elem and price_elem and link_elem:
-                        title = await title_elem.text_content()
-                        price_text = await price_elem.text_content()
-                        link = await link_elem.get_attribute("href")
-                        
-                        # Extract numeric price
-                        price_match = re.search(r"\$?([\d,]+(?:\.\d{2})?)", price_text)
-                        if price_match:
-                            price = float(price_match.group(1).replace(",", ""))
-                            
-                            if max_price is None or price <= max_price:
-                                deals.append({
-                                    "title": title.strip(),
-                                    "price": price,
-                                    "url": link,
-                                    "store": "eBay",
-                                    "platform": "ebay"
-                                })
-                except:
-                    pass
-            
-            await browser.close()
-    except Exception as e:
-        print(f"❌ eBay scrape error: {e}")
-    
-    return deals
+    """Mock eBay scraper"""
+    # Return mock deals for now to test the flow
+    return [
+        {
+            "title": f"eBay: {query} - Seller: BuyItNow",
+            "price": 129.99,
+            "url": f"https://www.ebay.com/sch/i.html?_nkw={query.replace(' ', '+')}",
+            "store": "eBay",
+            "platform": "ebay"
+        },
+        {
+            "title": f"eBay: {query} - Auction",
+            "price": 89.99,
+            "url": f"https://www.ebay.com/sch/i.html?_nkw={query.replace(' ', '+')}",
+            "store": "eBay",
+            "platform": "ebay"
+        }
+    ]
 
 
 async def save_deals_to_supabase(deals: list, hunt_id: str):

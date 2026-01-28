@@ -3,8 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
-from scraper import scrape_deals
-from supabase import create_client
 
 load_dotenv()
 
@@ -22,7 +20,21 @@ app.add_middleware(
 # Initialize Supabase
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-supabase = create_client(supabase_url, supabase_key)
+
+try:
+    from supabase import create_client
+    supabase = create_client(supabase_url, supabase_key)
+    print("✅ Supabase initialized")
+except Exception as e:
+    print(f"⚠️ Supabase init warning: {e}")
+    supabase = None
+
+# Import scraper after supabase is set up
+try:
+    from scraper import scrape_deals
+    print("✅ Scraper imported")
+except Exception as e:
+    print(f"⚠️ Scraper import warning: {e}")
 
 
 class ScraperRequest(BaseModel):
