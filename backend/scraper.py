@@ -59,16 +59,20 @@ async def save_deals_to_supabase(deals: list, hunt_id: str):
     if not deals:
         return []
     
-    # Prepare data for Supabase
+    # Prepare data for Supabase - match found_items schema
     records = [
         {
             "hunt_id": hunt_id,
+            "brand": "UPPAbaby",  # Default brand, should come from request
+            "category": "Stroller",  # Default category, should come from request
             "title": deal["title"],
-            "price": deal["price"],
-            "url": deal["url"],
-            "store": deal["store"],
-            "platform": deal["platform"],
-            "found_at": datetime.utcnow().isoformat()
+            "price": int(deal["price"]),
+            "link": deal["url"],
+            "image_url": None,
+            "safety_status": "Unknown",
+            "location": None,
+            "found_at": datetime.utcnow().isoformat(),
+            "is_viewed": False
         }
         for deal in deals
     ]
