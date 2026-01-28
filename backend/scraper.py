@@ -65,7 +65,8 @@ async def scrape_ebay(query: str, max_price: int | None = None):
 
 async def save_deals_to_supabase(deals: list, hunt_id: str):
     """Save deals to Supabase"""
-    if not deals:
+    if not deals or not supabase:
+        print(f"⚠️ Cannot save {len(deals) if deals else 0} deals - Supabase not initialized")
         return []
     
     # Prepare data for Supabase - match found_items schema
