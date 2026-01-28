@@ -57,7 +57,7 @@ class ScraperRequest(BaseModel):
 async def scout_deals(request: ScraperRequest):
     """
     Scrape eBay and Google Shopping for deals.
-    Saves results to Supabase deals table.
+    Saves results to Supabase found_items table.
     """
     try:
         query = f"{request.brand} {request.item_name or ''}".strip()

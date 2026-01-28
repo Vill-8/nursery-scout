@@ -74,7 +74,7 @@ async def save_deals_to_supabase(deals: list, hunt_id: str):
     ]
     
     try:
-        result = supabase.table("deals").insert(records).execute()
+        result = supabase.table("found_items").insert(records).execute()
         print(f"✅ Saved {len(records)} deals to Supabase")
         return records
     except Exception as e:
