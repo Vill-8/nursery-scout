@@ -1,6 +1,5 @@
 import asyncio
 from datetime import datetime
-from supabase import create_client
 import os
 from dotenv import load_dotenv
 
@@ -9,7 +8,17 @@ load_dotenv()
 # Supabase setup
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-supabase = create_client(supabase_url, supabase_key)
+
+supabase = None
+if supabase_url and supabase_key:
+    try:
+        from supabase import create_client
+        supabase = create_client(supabase_url, supabase_key)
+        print("✅ Supabase client initialized in scraper")
+    except Exception as e:
+        print(f"⚠️ Supabase init failed in scraper: {e}")
+else:
+    print("⚠️ Missing Supabase credentials in scraper")
 
 
 async def scrape_google_shopping(query: str, max_price: int | None = None):
