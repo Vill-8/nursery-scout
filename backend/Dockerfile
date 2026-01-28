@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first
-COPY requirements.txt .
+COPY backend/requirements.txt .
 
 # Install Python packages
 RUN pip install --no-cache-dir -r requirements.txt
@@ -17,8 +17,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN python -m playwright install chromium
 
 # Copy backend code
-COPY main.py .
-COPY scraper.py .
+COPY backend/main.py .
+COPY backend/scraper.py .
 
 EXPOSE ${PORT:-8000}
 
