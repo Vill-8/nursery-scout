@@ -4,7 +4,11 @@ from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+# Try to load .env for local development, but don't fail if it doesn't exist
+try:
+    load_dotenv()
+except:
+    pass
 
 app = FastAPI(title="Nursery Scout API")
 
@@ -21,13 +25,18 @@ app.add_middleware(
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
-try:
-    from supabase import create_client
-    supabase = create_client(supabase_url, supabase_key)
-    print("✅ Supabase initialized")
-except Exception as e:
-    print(f"⚠️ Supabase init warning: {e}")
+if not supabase_url or not supabase_key:
+    print("⚠️ WARNING: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variables")
+    print("   Set these in Railway variables to enable Supabase integration")
     supabase = None
+else:
+    try:
+        from supabase import create_client
+        supabase = create_client(supabase_url, supabase_key)
+        print("✅ Supabase initialized")
+    except Exception as e:
+        print(f"⚠️ Supabase init warning: {e}")
+        supabase = None
 
 # Import scraper after supabase is set up
 try:
